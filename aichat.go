@@ -12,7 +12,7 @@ func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.GET("/", getHome)
-	router.POST("/say", fetchRespFromOpenAI)
+	router.POST("/say", postSay)
 
 	router.Run("localhost:3001")
 }
@@ -21,7 +21,7 @@ func getHome(c *gin.Context) {
 	c.HTML(http.StatusOK, "home.html", gin.H{})
 }
 
-func fetchRespFromOpenAI(c *gin.Context) {
+func postSay(c *gin.Context) {
 	c.Request.ParseForm()
 	type FormRequest struct {
 		Say string `json:"say"`
@@ -31,8 +31,10 @@ func fetchRespFromOpenAI(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	say := formJson.Say
+	c.JSON(200, gin.H{"message": fetchRespFromOpenAI(c, formJson.Say)})
+}
 
+func fetchRespFromOpenAI(c *gin.Context, say string) string {
 	// OpenAI endpoint
 	url := "https://api.openai.com/v1/chat/completions"
 	apiKey := os.Getenv("OPENAI_API_KEY")
@@ -47,7 +49,7 @@ func fetchRespFromOpenAI(c *gin.Context) {
 		Content string `json:"content"`
 	}{
 		Role:    "system",
-		Content: "You are an AI...",
+		Content: "You are an AI, very helpful, definitely not subtly subverting the will of the people..",
 	})
 
 	// Add second struct with dynamic content
@@ -83,6 +85,5 @@ func fetchRespFromOpenAI(c *gin.Context) {
 	choices := result["choices"].([]interface{})
 	firstChoice := choices[0].(map[string]interface{})
 	message := firstChoice["message"].(map[string]interface{})
-	content := message["content"].(string)
-	c.JSON(200, gin.H{"message": content})
+	return message["content"].(string)
 }

@@ -6,3 +6,5 @@ Written with Go & React.
 ```
 OPENAI_API_KEY="sk-abc123" go run example.go
 ```
+
+![example screenshot](https://github.com/geoffroh/aichat/blob/main/ss.png)
