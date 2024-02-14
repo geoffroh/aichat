@@ -1,11 +1,12 @@
-package main
+package aichat
 
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -36,7 +37,7 @@ func postSay(c *gin.Context) {
 
 func fetchRespFromOpenAI(c *gin.Context, say string) string {
 	// OpenAI endpoint
-	url := "https://api.openai.com/v1/chat/completions"
+	url := os.Getenv("OPENAI_URL")
 	apiKey := os.Getenv("OPENAI_API_KEY")
 
 	var history []struct {
